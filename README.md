@@ -21,8 +21,7 @@ Placeholders to replace:
    be updated in `astro.config.mjs` and `public/robots.txt`, since neither can
    import TypeScript. `NOW` and `MARQUEE` are empty arrays; the homepage strip
    and the scrolling band only render once they have entries.
-2. `public/portrait.svg` — replace with a real photo and point the `src` at it
-   in `src/pages/index.astro`.
+2. `public/portrait.jpg` — the homepage photo.
 
 While the collections are empty, `astro build` prints `The collection "covers"
 does not exist or is empty`. That is expected and stops once a file exists.
