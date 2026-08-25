@@ -19,10 +19,6 @@ const pages: Record<string, { title: string; description: string }> = {
     title: "Musings",
     description: "Things I wrote down to find out what I thought.",
   },
-  about: {
-    title: "Who this is",
-    description: "The longer version.",
-  },
 };
 
 for (const musing of musings) {

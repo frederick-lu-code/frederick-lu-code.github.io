@@ -43,12 +43,6 @@ const ogImage = new URL(image, Astro.site ?? SITE.url).href;
     <meta name="generator" content={Astro.generator} />
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link
-      rel="alternate"
-      type="application/rss+xml"
-      title={`${SITE.name} — Musings`}
-      href="/rss.xml"
-    />
 
     <meta property="og:type" content={type} />
     <meta property="og:title" content={pageTitle} />
