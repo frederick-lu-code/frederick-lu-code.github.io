@@ -1,0 +1,52 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { formatShortDate } from "../lib/content";
+
+interface Props {
+  project: CollectionEntry<"projects">;
+}
+
+const { project } = Astro.props;
+const { title, deck, date, href, tags } = project.data;
+---
+
+<article class="border-t border-hairline last:border-b">
+  <div
+    class="grid gap-2 py-7 sm:grid-cols-[1fr_8rem] sm:items-baseline sm:gap-x-8"
+  >
+    <div class="flex flex-col gap-1.5">
+      {
+        href ? (
+          <a
+            href={href}
+            class="group no-underline"
+            rel="noopener"
+            target="_blank"
+          >
+            <h2 class="font-display text-title transition-colors duration-200 group-hover:text-rust">
+              {title}
+            </h2>
+          </a>
+        ) : (
+          <h2 class="font-display text-title">{title}</h2>
+        )
+      }
+      <p class="m-0 text-[0.9375rem] leading-relaxed text-ink-warm">{deck}</p>
+      {
+        tags.length > 0 && (
+          <ul class="m-0 mt-1 flex list-none flex-wrap gap-x-3 gap-y-1 p-0">
+            {tags.map((tag) => (
+              <li class="text-eyebrow tracking-[0.14em] text-stone uppercase">
+                {tag}
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+
+    <p class="m-0 text-meta text-stone sm:text-right">
+      <time datetime={date.toISOString()}>{formatShortDate(date)}</time>
+    </p>
+  </div>
+</article>
