@@ -1,0 +1,41 @@
+---
+import { SITE, SOCIALS } from "../config";
+
+const year = new Date().getFullYear();
+---
+
+<footer class="mt-24 border-t border-hairline">
+  <div
+    class="measure-wide mx-auto flex flex-col gap-6 px-5 py-10 sm:flex-row sm:items-baseline sm:justify-between sm:px-8"
+  >
+    <div class="flex flex-col gap-1">
+      <p class="m-0 text-meta text-stone">
+        Made slowly, by hand.
+      </p>
+      <p class="m-0 text-meta text-stone">
+        &copy; {year} {SITE.name}. Say hello:{" "}
+        <a href={`mailto:${SITE.email}`} class="link">{SITE.email}</a>
+      </p>
+    </div>
+
+    <ul class="m-0 flex list-none flex-wrap gap-5 p-0 text-meta">
+      {
+        SOCIALS.map((social) => (
+          <li>
+            <a
+              href={social.href}
+              class="link-quiet text-stone"
+              rel="me noopener"
+              target="_blank"
+            >
+              {social.label}
+            </a>
+          </li>
+        ))
+      }
+      <li>
+        <a href="/rss.xml" class="link-quiet text-stone">RSS</a>
+      </li>
+    </ul>
+  </div>
+</footer>

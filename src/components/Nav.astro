@@ -1,0 +1,57 @@
+---
+import { NAV, SITE } from "../config";
+
+const path = Astro.url.pathname;
+const isActive = (href: string) =>
+  path === href || path.startsWith(`${href}/`);
+---
+
+<header class="border-b border-hairline">
+  <nav
+    class="mx-auto flex max-w-(--measure-wide) flex-wrap items-baseline justify-between gap-x-6 gap-y-2 px-5 py-5 sm:px-8"
+    aria-label="Primary"
+  >
+    <a
+      href="/"
+      class="link-quiet text-[0.9375rem] tracking-tight"
+      aria-current={path === "/" ? "page" : undefined}
+    >
+      {SITE.name}<span class="text-rust">.</span>
+    </a>
+
+    <ul class="m-0 flex list-none flex-wrap items-baseline gap-5 p-0">
+      {
+        NAV.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              aria-current={isActive(item.href) ? "page" : undefined}
+              class:list={[
+                "link-quiet text-meta",
+                isActive(item.href) ? "text-rust" : "text-stone",
+              ]}
+            >
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</header>
+
+<style>
+  /* The active item gets a rule that sits below the baseline, like an
+     underscore typed on the next line down. */
+  a[aria-current="page"] {
+    position: relative;
+  }
+  nav ul a[aria-current="page"]::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: -0.35em;
+    height: 1px;
+    background-color: currentColor;
+  }
+</style>

@@ -1,0 +1,42 @@
+---
+import Base from "./Base.astro";
+
+interface Props {
+  title: string;
+  eyebrow?: string;
+  deck?: string;
+  description?: string;
+  image?: string;
+}
+
+/* MDX pages hand their frontmatter over under a `frontmatter` key; .astro
+   pages pass the props directly. */
+const props: Props = (Astro.props as any).frontmatter ?? Astro.props;
+const { title, eyebrow, deck, description, image } = props;
+---
+
+<Base title={title} description={description ?? deck} image={image}>
+  <article class="px-5 py-16 sm:px-8">
+    <header class="measure mx-auto">
+      {eyebrow && <p class="eyebrow eyebrow-rust m-0">{eyebrow}</p>}
+      <h1
+        class="font-display mt-5 mb-0 text-h1"
+      >
+        {title}
+      </h1>
+      {
+        deck && (
+          <p class="mt-5 mb-0 text-lg leading-relaxed text-stone-warm text-balance">
+            {deck}
+          </p>
+        )
+      }
+    </header>
+
+    <hr class="hairline measure mx-auto my-12" />
+
+    <div class="prose-typed mx-auto">
+      <slot />
+    </div>
+  </article>
+</Base>

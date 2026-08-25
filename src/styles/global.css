@@ -1,0 +1,373 @@
+@import "tailwindcss";
+
+/* TT2020 is subset from github.com/ctrlcctrlv/TT2020 (OFL). The full files are
+   ~1.8MB each because every letter carries dozens of alternates; the subset
+   keeps the `calt` feature that cycles them, which is what makes repeated
+   letters differ the way a real typewriter's do. See scripts/subset-tt2020.sh. */
+@font-face {
+  font-family: "TT2020 B";
+  src: url("/fonts/tt2020b-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "TT2020 B";
+  src: url("/fonts/tt2020b-italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "TT2020 E";
+  src: url("/fonts/tt2020e-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "TT2020 E";
+  src: url("/fonts/tt2020e-italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@theme {
+  /* Palette lifted from christopherigweze.com, plus marigold.
+     His stone (#8a8680) and rust (#b8532a) only reach 2.9:1 and 4.0:1 against
+     this paper, so the text-bearing colours are darkened to clear 4.5:1. The
+     original rust survives as `rust-bright` for decoration, where contrast
+     rules do not apply. */
+  --color-paper: #eae7e0;
+  --color-paper-light: #f7f5ef;
+  --color-ink: #1a1a1a;
+  --color-ink-warm: #1f1d1a;
+  --color-stone: #676460; /* 4.8:1 on paper */
+  --color-stone-warm: #666259; /* 5.0:1 on paper */
+  --color-rust: #a8481f; /* 4.7:1 on paper */
+  --color-rust-deep: #8f3c19; /* 6.0:1, hover state */
+  --color-rust-bright: #cf6939; /* decorative only, fails as text */
+  --color-marigold: #d9962b;
+  --color-hairline: #1a1a1a1f;
+  --color-hairline-faint: #1a1a1a0f;
+
+  /* Swap these two lines to change the whole site's voice. Run `npm run dev`
+     and open /type-lab to compare every candidate on this background. */
+  --font-body: "Courier Prime", Courier, "Courier New", monospace;
+  --font-display: "Young Serif", Georgia, serif;
+
+  /* Monospace runs wide, so 66 characters lands near 38rem rather than the
+     usual 65ch of a proportional face. */
+  --measure: 38rem;
+  --measure-wide: 60rem;
+
+  --text-meta: 0.8125rem;
+  --text-eyebrow: 0.6875rem;
+
+  /* Headings are only a little larger than the 1rem body, so the page reads as
+     one typed document rather than a poster with paragraphs underneath. Each
+     one clamps rather than stepping at breakpoints, so there is a single value
+     to adjust per level. */
+  --text-hero: clamp(2.75rem, 9vw, 4.5rem);
+  --text-h1: clamp(1.75rem, 4.5vw, 2.25rem);
+  --text-h2: 1.375rem;
+  --text-h3: 1.125rem;
+  /* Titles inside cards and list rows. */
+  --text-title: 1.25rem;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    background-color: var(--color-paper);
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.7;
+    font-variant-numeric: oldstyle-nums proportional-nums;
+    margin: 0;
+    /* Courier's counters clog at small sizes on a warm background. */
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    /* Loose enough for the smaller headings; the hero overrides it. */
+    line-height: 1.15;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  ::selection {
+    background-color: var(--color-marigold);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-rust);
+    outline-offset: 3px;
+  }
+
+  img,
+  video,
+  iframe {
+    display: block;
+    max-width: 100%;
+  }
+}
+
+@layer components {
+  /* The small tracked-out uppercase label that marks every section. */
+  .eyebrow {
+    font-size: var(--text-eyebrow);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-stone);
+    line-height: 1.4;
+  }
+
+  .eyebrow-rust {
+    color: var(--color-rust);
+  }
+
+  /* Chimero's link treatment: 1px rule, generous offset, colour shift on
+     hover rather than a style change. */
+  .link {
+    color: var(--color-rust);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-decoration-color: color-mix(in srgb, var(--color-rust) 40%, transparent);
+    text-underline-offset: 0.15em;
+    transition:
+      color 0.2s ease,
+      text-decoration-color 0.2s ease;
+  }
+  .link:hover {
+    color: var(--color-rust-deep);
+    text-decoration-color: currentColor;
+  }
+
+  .link-quiet {
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  .link-quiet:hover {
+    color: var(--color-rust);
+  }
+
+  /* A strip of marigold behind text, drawn like a highlighter that overran. */
+  .highlight {
+    background-image: linear-gradient(
+      to bottom,
+      transparent 58%,
+      color-mix(in srgb, var(--color-marigold) 70%, transparent) 58%
+    );
+    padding-inline: 0.1em;
+  }
+
+  /* Slightly askew, like something taped to the page. */
+  .tape {
+    display: inline-block;
+    background-color: var(--color-marigold);
+    color: var(--color-ink);
+    padding: 0.2rem 0.6rem;
+    rotate: -1.5deg;
+  }
+
+  .hairline {
+    border: 0;
+    border-top: 1px solid var(--color-hairline);
+  }
+
+  /* Long-form article body. Applied to rendered MDX. */
+  .prose-typed {
+    max-width: var(--measure);
+  }
+  .prose-typed > * + * {
+    margin-top: 1.5em;
+  }
+  .prose-typed h2 {
+    font-size: var(--text-h2);
+    margin-top: 2.5em;
+    margin-bottom: -0.5em;
+  }
+  .prose-typed h3 {
+    font-size: var(--text-h3);
+    margin-top: 2em;
+    margin-bottom: -0.6em;
+  }
+  .prose-typed a {
+    color: var(--color-rust);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-decoration-color: color-mix(in srgb, var(--color-rust) 40%, transparent);
+    text-underline-offset: 0.15em;
+    transition:
+      color 0.2s ease,
+      text-decoration-color 0.2s ease;
+  }
+  .prose-typed a:hover {
+    color: var(--color-rust-deep);
+    text-decoration-color: currentColor;
+  }
+  .prose-typed blockquote {
+    border-left: 2px solid var(--color-rust);
+    padding-left: 1.25rem;
+    margin-inline: 0;
+    color: var(--color-stone-warm);
+    font-style: italic;
+  }
+  .prose-typed ul,
+  .prose-typed ol {
+    padding-left: 1.4em;
+  }
+  .prose-typed li + li {
+    margin-top: 0.4em;
+  }
+  .prose-typed ul {
+    list-style: none;
+    padding-left: 1.2em;
+  }
+  .prose-typed ul > li::before {
+    content: "—";
+    color: var(--color-rust);
+    margin-left: -1.2em;
+    margin-right: 0.45em;
+  }
+  .prose-typed hr {
+    border: 0;
+    border-top: 1px solid var(--color-hairline);
+    max-width: 8rem;
+    margin: 3em 0;
+  }
+  .prose-typed code {
+    background-color: var(--color-paper-light);
+    border: 1px solid var(--color-hairline-faint);
+    padding: 0.05em 0.35em;
+    font-size: 0.9em;
+  }
+  .prose-typed pre {
+    background-color: var(--color-paper-light);
+    border: 1px solid var(--color-hairline);
+    padding: 1rem 1.2rem;
+    overflow-x: auto;
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+  .prose-typed pre code {
+    background: none;
+    border: 0;
+    padding: 0;
+  }
+  .prose-typed figure {
+    margin-inline: 0;
+  }
+  .prose-typed figcaption {
+    font-size: var(--text-meta);
+    color: var(--color-stone);
+    margin-top: 0.6rem;
+  }
+  .prose-typed sup a {
+    text-decoration: none;
+  }
+  /* Rehype's footnote section, styled down so it reads as an appendix. */
+  .prose-typed .footnotes {
+    margin-top: 4em;
+    padding-top: 1.5em;
+    border-top: 1px solid var(--color-hairline);
+    font-size: var(--text-meta);
+    color: var(--color-stone-warm);
+  }
+  .prose-typed .footnotes h2 {
+    font-size: var(--text-eyebrow);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-stone);
+    font-family: var(--font-body);
+    margin: 0 0 1em;
+  }
+}
+
+@layer utilities {
+  /* Paper grain. A tiny SVG turbulence tile at very low opacity, fixed so it
+     does not swim while scrolling. */
+  .grain::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    pointer-events: none;
+    opacity: 0.35;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.22'/%3E%3C/svg%3E");
+  }
+
+  .measure {
+    max-width: var(--measure);
+  }
+  .measure-wide {
+    max-width: var(--measure-wide);
+  }
+
+  @keyframes marquee-drift {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  .animate-marquee {
+    animation: marquee-drift var(--marquee-duration, 42s) linear infinite;
+  }
+
+  @keyframes nudge-in {
+    from {
+      opacity: 0;
+      transform: translateY(0.6rem);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .animate-nudge-in {
+    animation: nudge-in 0.5s ease both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .animate-marquee {
+    animation: none !important;
+  }
+}

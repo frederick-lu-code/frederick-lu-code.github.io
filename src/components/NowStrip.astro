@@ -1,0 +1,26 @@
+---
+import { NOW } from "../config";
+---
+
+{/* Full-bleed rules, but the cells line up with the rest of the page. */}
+{
+  NOW.length > 0 && (
+    <section aria-labelledby="now-heading" class="border-y border-hairline">
+      <h2 id="now-heading" class="sr-only">
+        Right now
+      </h2>
+      <div class="measure-wide mx-auto px-5 sm:px-8">
+        <dl class="m-0 grid grid-cols-2 gap-x-6 gap-y-6 py-7 md:grid-cols-4">
+          {NOW.map((item) => (
+            <div class="flex flex-col gap-1.5">
+              <dt class="eyebrow eyebrow-rust">{item.label}</dt>
+              <dd class="m-0 text-[0.9375rem] leading-snug text-balance">
+                {item.value}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
+  )
+}

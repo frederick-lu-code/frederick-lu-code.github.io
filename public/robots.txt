@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /type-lab
+
+Sitemap: https://freddie.dev/sitemap-index.xml

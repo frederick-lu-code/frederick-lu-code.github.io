@@ -1,0 +1,84 @@
+---
+import { YouTube } from "astro-embed";
+import type { CollectionEntry } from "astro:content";
+import { bestPoster, formatDate } from "../lib/content";
+
+interface Props {
+  cover: CollectionEntry<"covers">;
+  featured?: boolean;
+}
+
+const { cover, featured = false } = Astro.props;
+const { title, artist, youtubeId, date, note, tags } = cover.data;
+const poster = await bestPoster(youtubeId);
+---
+
+<article
+  class:list={[
+    "group border border-hairline bg-paper-light transition-colors duration-200 hover:border-rust",
+    featured && "sm:grid sm:grid-cols-[1.4fr_1fr]",
+  ]}
+>
+  <div
+    class:list={[
+      "cover-player border-b border-hairline sm:border-b-0",
+      featured && "sm:self-center sm:border-b-0",
+    ]}
+  >
+    <YouTube id={youtubeId} poster={poster} playlabel={`Play ${title}`} />
+  </div>
+
+  <div
+    class:list={[
+      "flex flex-col gap-3 p-5",
+      featured && "sm:justify-center sm:border-l sm:border-hairline sm:p-8",
+    ]}
+  >
+    <div>
+      <h3
+        class:list={[
+          "leading-tight",
+          featured ? "font-display text-title" : "text-h3",
+        ]}
+      >
+        {title}
+      </h3>
+      <p class="mt-1.5 mb-0 text-meta text-stone">
+        {artist} &middot; <time datetime={date.toISOString()}>{formatDate(date)}</time>
+      </p>
+    </div>
+
+    <p class="m-0 text-[0.9375rem] leading-relaxed text-ink-warm">{note}</p>
+
+    {
+      tags.length > 0 && (
+        <ul class="m-0 flex list-none flex-wrap gap-x-3 gap-y-1 p-0">
+          {tags.map((tag) => (
+            <li class="text-eyebrow tracking-[0.14em] text-stone uppercase">
+              {tag}
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </div>
+</article>
+
+<style>
+  /* lite-youtube ships its own styles; these just square off the corners and
+     tint the play button to match the palette. */
+  .cover-player :global(lite-youtube) {
+    max-width: 100%;
+    border-radius: 0;
+  }
+  .cover-player :global(lite-youtube > .lty-playbtn) {
+    filter: none;
+  }
+  .cover-player :global(lite-youtube::before) {
+    background-image: linear-gradient(
+      to bottom,
+      color-mix(in srgb, #1a1a1a 55%, transparent),
+      transparent 60%
+    );
+  }
+</style>

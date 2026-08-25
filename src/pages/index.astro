@@ -1,0 +1,117 @@
+---
+import Base from "../layouts/Base.astro";
+import CoverCard from "../components/CoverCard.astro";
+import Marquee from "../components/Marquee.astro";
+import NowStrip from "../components/NowStrip.astro";
+import EmptySlot from "../components/EmptySlot.astro";
+import { SITE } from "../config";
+import {
+  formatShortDate,
+  getCovers,
+  getMusings,
+  readingTime,
+} from "../lib/content";
+
+const [covers, musings] = await Promise.all([getCovers(), getMusings()]);
+const latestCover = covers[0];
+const latestMusing = musings[0];
+---
+
+<Base description={SITE.description}>
+  <section
+    class="measure-wide mx-auto grid gap-10 px-5 pt-16 pb-20 sm:px-8 md:grid-cols-[1.6fr_1fr] md:items-end md:gap-14"
+  >
+    <div class="animate-nudge-in">
+      <p class="eyebrow eyebrow-rust m-0">Personal site &middot; est. 2026</p>
+
+      <h1 class="font-display mt-5 mb-0 text-hero leading-[0.9]">
+        {SITE.name}
+      </h1>
+
+      <p class="measure mt-6 mb-0 leading-relaxed text-ink-warm">
+        {SITE.tagline}
+      </p>
+
+      <p class="mt-8 mb-0 flex flex-wrap items-center gap-x-6 gap-y-3">
+        <a href="/music" class="link text-[0.9375rem]">Hear the guitar</a>
+        <a href="/musings" class="link text-[0.9375rem]">Read the musings</a>
+        <a href="/about" class="link text-[0.9375rem]">Who this is</a>
+      </p>
+    </div>
+
+    <figure class="relative m-0 justify-self-start md:justify-self-end">
+      <span
+        class="tape absolute -top-3 left-1/2 z-10 -translate-x-1/2 text-eyebrow tracking-[0.14em] uppercase"
+      >
+        that&rsquo;s me
+      </span>
+      <img
+        src="/portrait.svg"
+        alt="Freddie, holding a guitar"
+        width="400"
+        height="500"
+        class="w-56 max-w-full rotate-[-2deg] border border-hairline sm:w-64"
+      />
+    </figure>
+  </section>
+
+  <NowStrip />
+
+  <section
+    class="measure-wide mx-auto grid gap-10 px-5 py-20 sm:px-8 lg:grid-cols-2 lg:gap-8"
+  >
+    <div class="flex flex-col gap-5">
+      <div class="flex items-baseline justify-between gap-4">
+        <h2 class="eyebrow eyebrow-rust font-body">Latest cover</h2>
+        <a href="/music" class="link-quiet text-meta text-stone">All music</a>
+      </div>
+      {
+        latestCover ? (
+          <CoverCard cover={latestCover} />
+        ) : (
+          <EmptySlot label="No covers yet" tall />
+        )
+      }
+    </div>
+
+    <div class="flex flex-col gap-5">
+      <div class="flex items-baseline justify-between gap-4">
+        <h2 class="eyebrow eyebrow-rust font-body">Latest musing</h2>
+        <a href="/musings" class="link-quiet text-meta text-stone">
+          All writing
+        </a>
+      </div>
+
+      {
+        latestMusing ? (
+          <a
+            href={`/musings/${latestMusing.id}`}
+            class="group flex flex-1 flex-col gap-4 border border-hairline bg-paper-light p-5 no-underline transition-colors duration-200 hover:border-rust sm:p-8"
+          >
+            <p class="m-0 text-meta text-stone">
+              <time datetime={latestMusing.data.date.toISOString()}>
+                {formatShortDate(latestMusing.data.date)}
+              </time>
+              {" \u00b7 "}
+              {readingTime(latestMusing.body)}
+            </p>
+
+            <h3 class="font-display text-title transition-colors duration-200 group-hover:text-rust">
+              {latestMusing.data.title}
+            </h3>
+
+            <p class="m-0 text-[0.9375rem] leading-relaxed text-ink-warm">
+              {latestMusing.data.deck}
+            </p>
+
+            <p class="link mt-auto mb-0 text-meta">Read it</p>
+          </a>
+        ) : (
+          <EmptySlot label="Nothing written yet" tall />
+        )
+      }
+    </div>
+  </section>
+
+  <Marquee />
+</Base>

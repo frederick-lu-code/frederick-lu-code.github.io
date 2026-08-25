@@ -1,0 +1,22 @@
+---
+import Base from "../layouts/Base.astro";
+import PageHeader from "../components/PageHeader.astro";
+import Timeline from "../components/Timeline.astro";
+import { ROLES } from "../data/experience";
+---
+
+<Base
+  title="Experience"
+  description="Where I have worked: Jane Street, TikTok, Google, UNSW and Loch Safety."
+  image="/og/experience.png"
+>
+  <PageHeader
+    eyebrow="Experience"
+    title="Where I have worked"
+    intro="The professional half, kept short."
+  />
+
+  <section class="measure-wide mx-auto px-5 pb-24 sm:px-8">
+    <Timeline roles={ROLES} />
+  </section>
+</Base>

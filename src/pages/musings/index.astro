@@ -1,0 +1,43 @@
+---
+import Base from "../../layouts/Base.astro";
+import MusingRow from "../../components/MusingRow.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import EmptySlot from "../../components/EmptySlot.astro";
+import { getMusings } from "../../lib/content";
+
+const musings = await getMusings();
+---
+
+<Base
+  title="Musings"
+  description="Essays about guitar, maths, and making things slowly."
+  image="/og/musings.png"
+>
+  <PageHeader
+    eyebrow="Musings"
+    title="Things I wrote down to find out what I thought"
+    intro="No schedule, no newsletter, no growth strategy. They appear when something has been rattling around long enough to be worth the trouble."
+  />
+
+  <section class="measure-wide mx-auto px-5 pb-20 sm:px-8">
+    {
+      musings.length === 0 ? (
+        <EmptySlot
+          label="Nothing written yet"
+          hint="Add an .mdx file to src/content/musings/ and it appears here."
+        />
+      ) : (
+        <ol class="m-0 list-none p-0">
+          {musings.map((musing, index) => (
+            <MusingRow musing={musing} index={index} />
+          ))}
+        </ol>
+      )
+    }
+
+    <p class="mt-10 mb-0 text-meta text-stone">
+      There is <a href="/rss.xml" class="link">a feed</a> if you would rather
+      not remember to come back.
+    </p>
+  </section>
+</Base>

@@ -1,0 +1,75 @@
+---
+import type { GetStaticPaths } from "astro";
+import { render } from "astro:content";
+import Article from "../../layouts/Article.astro";
+import { getMusings, readingTime } from "../../lib/content";
+
+export const getStaticPaths = (async () => {
+  const musings = await getMusings();
+
+  return musings.map((musing, index) => ({
+    params: { slug: musing.id },
+    props: {
+      musing,
+      /* The list is newest-first, so the neighbour above is the newer one. */
+      newer: musings[index - 1],
+      older: musings[index + 1],
+    },
+  }));
+}) satisfies GetStaticPaths;
+
+const { musing, newer, older } = Astro.props;
+const { Content } = await render(musing);
+---
+
+<Article
+  title={musing.data.title}
+  deck={musing.data.deck}
+  date={musing.data.date}
+  updated={musing.data.updated}
+  tags={musing.data.tags}
+  readingTime={readingTime(musing.body)}
+  image={`/og/${musing.id}.png`}
+>
+  <Content />
+
+  <div slot="footer" class="flex flex-col gap-8">
+    <nav
+      class="flex flex-col gap-6 sm:flex-row sm:justify-between"
+      aria-label="More musings"
+    >
+      {
+        older ? (
+          <a href={`/musings/${older.id}`} class="link-quiet group max-w-[18rem]">
+            <span class="eyebrow block">Older</span>
+            <span class="mt-1 block font-display text-title transition-colors duration-200 group-hover:text-rust">
+              {older.data.title}
+            </span>
+          </a>
+        ) : (
+          <span />
+        )
+      }
+
+      {
+        newer && (
+          <a
+            href={`/musings/${newer.id}`}
+            class="link-quiet group max-w-[18rem] sm:text-right"
+          >
+            <span class="eyebrow block">Newer</span>
+            <span class="mt-1 block font-display text-title transition-colors duration-200 group-hover:text-rust">
+              {newer.data.title}
+            </span>
+          </a>
+        )
+      }
+    </nav>
+
+    <p class="m-0 text-meta text-stone">
+      <a href="/musings" class="link">All musings</a>
+      {" \u00b7 "}
+      <a href="/rss.xml" class="link">RSS</a>
+    </p>
+  </div>
+</Article>
