@@ -1,0 +1,75 @@
+---
+import Base from "./Base.astro";
+import { formatDate } from "../lib/content";
+
+interface Props {
+  title: string;
+  deck: string;
+  date: Date;
+  updated?: Date;
+  tags?: string[];
+  readingTime?: string;
+  eyebrow?: string;
+  image?: string;
+}
+
+const {
+  title,
+  deck,
+  date,
+  updated,
+  tags = [],
+  readingTime,
+  eyebrow = "Musings",
+  image,
+} = Astro.props;
+
+const meta = [
+  formatDate(date),
+  readingTime,
+  updated && `updated ${formatDate(updated)}`,
+].filter(Boolean);
+---
+
+<Base title={title} description={deck} type="article" image={image}>
+  <article class="px-5 py-16 sm:px-8">
+    <header class="measure mx-auto">
+      <p class="eyebrow eyebrow-rust m-0">{eyebrow}</p>
+
+      <h1
+        class="font-display mt-5 mb-0 text-h1"
+      >
+        {title}
+      </h1>
+
+      <p class="mt-5 mb-0 text-lg leading-relaxed text-stone-warm text-balance">
+        {deck}
+      </p>
+
+      <p class="mt-6 mb-0 text-meta text-stone">
+        <time datetime={date.toISOString()}>{meta[0]}</time>
+        {meta.slice(1).map((part) => <span>{" \u00b7 "}{part}</span>)}
+      </p>
+    </header>
+
+    <hr class="hairline measure mx-auto my-12" />
+
+    <div class="prose-typed mx-auto">
+      <slot />
+    </div>
+
+    {
+      tags.length > 0 && (
+        <ul class="measure mx-auto mt-14 flex list-none flex-wrap gap-x-3 gap-y-1 p-0">
+          {tags.map((tag) => (
+            <li class="eyebrow">{tag}</li>
+          ))}
+        </ul>
+      )
+    }
+
+    <footer class="measure mx-auto mt-16 border-t border-hairline pt-8">
+      <slot name="footer" />
+    </footer>
+  </article>
+</Base>

@@ -1,0 +1,33 @@
+---
+interface Props {
+  src: string;
+  alt: string;
+  caption?: string;
+  /** Nudges the image off-axis, like a print laid down by hand. */
+  tilt?: number;
+  width?: number;
+  height?: number;
+}
+
+const { src, alt, caption, tilt = 0, width, height } = Astro.props;
+---
+
+<figure class="my-10">
+  <img
+    src={src}
+    alt={alt}
+    width={width}
+    height={height}
+    loading="lazy"
+    decoding="async"
+    class="w-full border border-hairline"
+    style={[
+      /* Never blow an image up past its own pixels. */
+      width ? `max-width: ${width}px` : "",
+      tilt ? `rotate: ${tilt}deg` : "",
+    ]
+      .filter(Boolean)
+      .join("; ") || undefined}
+  />
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>

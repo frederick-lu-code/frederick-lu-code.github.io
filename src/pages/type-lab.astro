@@ -1,0 +1,568 @@
+---
+/* A build tool, not a page. It stays out of the sitemap (see astro.config.mjs),
+   carries a noindex, and bounces to the homepage in a production build. Run
+   `npm run dev` and visit /type-lab to use it. */
+if (import.meta.env.PROD) {
+  return Astro.redirect("/");
+}
+
+import "../styles/global.css";
+
+import "@fontsource/courier-prime/400.css";
+import "@fontsource/courier-prime/400-italic.css";
+import "@fontsource/courier-prime/700.css";
+
+import "@fontsource/anton/400.css";
+import "@fontsource/young-serif/400.css";
+import "@fontsource/zilla-slab/400.css";
+import "@fontsource/zilla-slab/600.css";
+import "@fontsource/gloock/400.css";
+/* Bare specifiers here, not /index.css: @fontsource-variable/big-shoulders-display@5.3.0
+   is missing the "./*.css" entry in its exports map, so the explicit path fails
+   to resolve. The bare import hits "." and works for all of them. */
+import "@fontsource-variable/bricolage-grotesque";
+import "@fontsource-variable/syne";
+import "@fontsource-variable/unbounded";
+import "@fontsource-variable/bodoni-moda";
+import "@fontsource-variable/newsreader";
+import "@fontsource-variable/big-shoulders-display";
+
+const bodyFaces = [
+  {
+    id: "courier-prime",
+    label: "Courier Prime",
+    stack: '"Courier Prime", Courier, monospace',
+    note: "Screen-optimised Courier redraw. Real bold and italic, consistent on every platform.",
+  },
+  {
+    id: "system-courier",
+    label: "System Courier",
+    stack: 'Courier, "Courier New", monospace',
+    note: "Literally what frankchimero.com uses. Authentic on a Mac, falls back to a generic mono on Linux.",
+  },
+  {
+    id: "tt2020b",
+    label: "TT2020 B",
+    stack: '"TT2020 B", Courier, monospace',
+    note: "Randomises ink imperfections per glyph. Watch the repeated letters. 442KB subset.",
+  },
+  {
+    id: "tt2020e",
+    label: "TT2020 E",
+    stack: '"TT2020 E", Courier, monospace',
+    note: "Lighter, cleaner strike than Style B. Same randomisation. 424KB subset.",
+  },
+];
+
+interface DisplayFace {
+  id: string;
+  label: string;
+  stack: string;
+  note: string;
+  /** Some faces only look like themselves above regular. */
+  weight?: number;
+  /** font-variation-settings for the variable ones. */
+  variation?: string;
+}
+
+/* Grouped so ten options stay scannable. Each group is a different answer to
+   "what should the loud voice on this site sound like". */
+const displayGroups: Array<{ group: string; faces: DisplayFace[] }> = [
+  {
+    group: "Loud",
+    faces: [
+      {
+        id: "anton",
+        label: "Anton",
+        stack: "Anton, Impact, sans-serif",
+        note: "Heavy condensed poster type. Gig-flyer energy, maximum impact at large sizes.",
+      },
+      {
+        id: "big-shoulders",
+        label: "Big Shoulders",
+        stack: '"Big Shoulders Display Variable", Impact, sans-serif',
+        weight: 700,
+        note: "Tall and narrow. Fits long headlines on one line without shrinking them.",
+      },
+      {
+        id: "unbounded",
+        label: "Unbounded",
+        stack: '"Unbounded Variable", sans-serif',
+        weight: 600,
+        note: "Geometric and wide. Modern and confident, verging on a logo.",
+      },
+    ],
+  },
+  {
+    group: "Odd",
+    faces: [
+      {
+        id: "bricolage",
+        label: "Bricolage Grotesque",
+        stack: '"Bricolage Grotesque Variable", sans-serif',
+        weight: 600,
+        variation: '"wdth" 100, "opsz" 48',
+        note: "Deliberately uneven widths and wonky curves. The most hand-made of the sans options.",
+      },
+      {
+        id: "syne",
+        label: "Syne",
+        stack: '"Syne Variable", sans-serif',
+        weight: 700,
+        note: "Art-gallery weird. Wide, off-balance letterforms that nobody else is using.",
+      },
+    ],
+  },
+  {
+    group: "Warm",
+    faces: [
+      {
+        id: "young-serif",
+        label: "Young Serif",
+        stack: '"Young Serif", Georgia, serif',
+        note: "Chunky, friendly, generous slabs. Warm without being twee. Current default.",
+      },
+      {
+        id: "zilla-slab",
+        label: "Zilla Slab",
+        stack: '"Zilla Slab", Georgia, serif',
+        weight: 600,
+        note: "A slab serif, so it rhymes with the typewriter body without imitating it.",
+      },
+      {
+        id: "newsreader",
+        label: "Newsreader",
+        stack: '"Newsreader Variable", Georgia, serif',
+        weight: 500,
+        variation: '"opsz" 72',
+        note: "Editorial and readable. The quietest option, closest to a magazine.",
+      },
+    ],
+  },
+  {
+    group: "Sharp",
+    faces: [
+      {
+        id: "bodoni",
+        label: "Bodoni Moda",
+        stack: '"Bodoni Moda Variable", Georgia, serif',
+        variation: '"opsz" 96',
+        note: "Extreme thick-to-thin contrast. Fashion masthead. Dramatic but cold.",
+      },
+      {
+        id: "gloock",
+        label: "Gloock",
+        stack: "Gloock, Georgia, serif",
+        note: "High contrast with heavier stems than Bodoni. Striking and a bit strange.",
+      },
+    ],
+  },
+  {
+    group: "None",
+    faces: [
+      {
+        id: "same-as-body",
+        label: "Same as body",
+        stack: "var(--lab-body-stack)",
+        note: "No display face at all. Headlines set in the typewriter, big. The most restrained, most Chimero option.",
+      },
+    ],
+  },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Type lab</title>
+    <meta name="theme-color" content="#eae7e0" />
+  </head>
+  <body class="bg-paper text-ink">
+    <header
+      class="sticky top-0 z-20 border-b border-hairline bg-paper/95 backdrop-blur"
+    >
+      <div class="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-4">
+        <div class="flex flex-wrap items-baseline justify-between gap-3">
+          <h1 class="m-0 font-body text-[0.8125rem] tracking-wide text-stone uppercase">
+            Type lab
+          </h1>
+          <p class="m-0 text-[0.8125rem] text-ink" aria-live="polite" id="readout">
+          </p>
+        </div>
+
+        <fieldset class="m-0 border-0 p-0">
+          <legend
+            class="mb-2 p-0 text-[0.6875rem] tracking-[0.14em] text-stone uppercase"
+          >
+            Body / typewriter
+          </legend>
+          <div class="flex flex-wrap gap-2">
+            {
+              bodyFaces.map((face) => (
+                <button
+                  type="button"
+                  class="lab-chip"
+                  data-group="body"
+                  data-id={face.id}
+                  data-stack={face.stack}
+                  data-note={face.note}
+                >
+                  {face.label}
+                </button>
+              ))
+            }
+          </div>
+        </fieldset>
+
+        <fieldset class="m-0 border-0 p-0">
+          <legend
+            class="mb-2 p-0 text-[0.6875rem] tracking-[0.14em] text-stone uppercase"
+          >
+            Display / headline
+          </legend>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+            {
+              displayGroups.map((group) => (
+                <div class="flex items-center gap-2">
+                  <span class="text-[0.625rem] tracking-[0.14em] text-stone uppercase">
+                    {group.group}
+                  </span>
+                  {group.faces.map((face) => (
+                    <button
+                      type="button"
+                      class="lab-chip"
+                      data-group="display"
+                      data-id={face.id}
+                      data-stack={face.stack}
+                      data-note={face.note}
+                      data-weight={face.weight ?? 400}
+                      data-variation={face.variation ?? ""}
+                    >
+                      {face.label}
+                    </button>
+                  ))}
+                </div>
+              ))
+            }
+          </div>
+        </fieldset>
+
+        <div class="grid gap-x-6 gap-y-3 sm:grid-cols-2 lg:grid-cols-4">
+          <label class="lab-slider">
+            <span>Body size <output id="out-size">16px</output></span>
+            <input type="range" id="in-size" min="12" max="22" step="0.5" value="16" />
+          </label>
+          <label class="lab-slider">
+            <span>Line height <output id="out-leading">1.70</output></span>
+            <input type="range" id="in-leading" min="1.3" max="2.1" step="0.05" value="1.7" />
+          </label>
+          <label class="lab-slider">
+            <span>Measure <output id="out-measure">38rem</output></span>
+            <input type="range" id="in-measure" min="26" max="60" step="1" value="38" />
+          </label>
+          <label class="lab-slider">
+            <span>Headline <output id="out-display">4.5rem</output></span>
+            <input type="range" id="in-display" min="2" max="9" step="0.25" value="4.5" />
+          </label>
+        </div>
+
+        <p class="m-0 text-[0.75rem] leading-relaxed text-stone" id="notes"></p>
+      </div>
+    </header>
+
+    <main id="specimen" class="px-5 py-14">
+      <div class="mx-auto mb-16 max-w-6xl">
+        <p class="eyebrow mb-6">Your name, at the size it appears on the homepage</p>
+        <p
+          class="m-0 font-display leading-[0.82]"
+          style="font-size: clamp(4rem, 15vw, 10rem)"
+        >
+          Freddie
+        </p>
+      </div>
+
+      <div class="mx-auto" style="max-width: var(--measure)">
+        <p class="m-0 text-[0.75rem] tracking-[0.14em] text-rust uppercase">
+          Musings
+        </p>
+        <h2
+          class="my-4 font-display leading-[0.95] text-balance"
+          style="font-size: var(--display-size)"
+        >
+          The song I could not play for eleven years
+        </h2>
+        <p class="mt-0 mb-10 text-stone">
+          Fingerstyle, capo on 2 &middot; 14 March 2026 &middot; 6 min read
+        </p>
+
+        <p>
+          I learned the first eight bars when I was fifteen and then I stopped,
+          the way you stop doing anything that asks you to be bad at it in
+          public for a while. The tab sat in a folder on three consecutive
+          laptops. Every migration I looked at the filename and thought, not
+          yet, and every time the not-yet got a little heavier and a little
+          easier to carry.
+        </p>
+
+        <p>
+          What changed was nothing dramatic. My flat had a radiator that ticked
+          at night and I could not sleep, so I sat on the floor with the guitar
+          across my knees and played the same four bars until they stopped
+          sounding like an accusation. Repetition is the whole secret and nobody
+          wants it to be, because it means the only thing separating you from
+          the thing you want is a boring number of Tuesdays.
+        </p>
+
+        <blockquote class="my-9 border-l-2 border-rust pl-5 text-stone italic">
+          Nobody wants the secret to be repetition, because it means the only
+          thing between you and the thing you want is a boring number of
+          Tuesdays.
+        </blockquote>
+
+        <h3 class="mt-10 mb-3 font-display text-2xl leading-tight">
+          On being bad at things on purpose
+        </h3>
+
+        <p>
+          There is a version of me that only ever posts the take where nothing
+          goes wrong. That version is a coward and also, frankly, <em
+            >a much worse guitarist</em
+          >, because he never gets to the part where the mistake teaches him the
+          fingering. So the recordings on <a href="/music" class="lab-link"
+            >this site</a
+          > have buzzes in them. One of them has a siren going past at 2:14. I left
+          it in.
+        </p>
+
+        <p>
+          Aaaaa, bbbbb, ccccc, ddddd, eeeee &mdash; look closely at the
+          repeated letters: with TT2020 selected each one is struck slightly
+          differently, the way a real typewriter never quite lands the same
+          letter twice.
+        </p>
+
+        <hr class="mx-0 my-10 h-px border-0 bg-hairline" />
+
+        <p class="text-stone" style="font-size: var(--text-meta)">
+          ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789
+          &amp;@#$%&ndash;&mdash;&ldquo;&rdquo;&lsquo;&rsquo;()[]&#123;&#125;/\?!.,;:
+        </p>
+      </div>
+
+      <div class="mx-auto mt-16 max-w-6xl">
+        <p class="eyebrow mb-6">Headlines at a few sizes</p>
+        <p class="m-0 font-display text-6xl leading-[0.95]">
+          Songs I have taken apart
+        </p>
+        <p class="mt-4 mb-0 font-display text-4xl leading-tight">
+          Guitar covers, half-finished proofs, and things I keep thinking about
+        </p>
+        <p class="mt-4 mb-0 font-display text-xl leading-tight">
+          Smaller heading, still the display face
+        </p>
+      </div>
+
+      <div class="mx-auto mt-16 max-w-6xl">
+        <p class="eyebrow mb-4">Accents on paper</p>
+        <div class="flex flex-wrap gap-3">
+          <span class="bg-rust px-4 py-2 text-paper">rust #a8481f</span>
+          <span class="bg-rust-deep px-4 py-2 text-paper">deep #8f3c19</span>
+          <span class="bg-rust-bright px-4 py-2 text-paper">bright #cf6939</span>
+          <span class="bg-marigold px-4 py-2 text-ink">marigold #d9962b</span>
+          <span class="bg-paper-light px-4 py-2 text-ink ring-1 ring-hairline"
+            >paper-light #f7f5ef</span
+          >
+          <span class="bg-ink px-4 py-2 text-paper">ink #1a1a1a</span>
+        </div>
+      </div>
+    </main>
+
+    <style>
+      .lab-chip {
+        border: 1px solid var(--color-hairline);
+        background: transparent;
+        color: var(--color-ink);
+        padding: 0.35rem 0.75rem;
+        font: inherit;
+        font-family: var(--font-body);
+        font-size: 0.8125rem;
+        cursor: pointer;
+        transition:
+          background-color 0.15s ease,
+          color 0.15s ease,
+          border-color 0.15s ease;
+      }
+      .lab-chip:hover {
+        border-color: var(--color-rust);
+        color: var(--color-rust);
+      }
+      .lab-chip[aria-pressed="true"] {
+        background: var(--color-ink);
+        border-color: var(--color-ink);
+        color: var(--color-paper);
+      }
+
+      .lab-slider {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        font-size: 0.6875rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--color-stone);
+      }
+      .lab-slider input {
+        accent-color: var(--color-rust);
+        width: 100%;
+      }
+      .lab-slider output {
+        color: var(--color-ink);
+        text-transform: none;
+        letter-spacing: normal;
+      }
+
+      .lab-link {
+        color: var(--color-rust);
+        text-decoration: underline;
+        text-decoration-thickness: 1px;
+        text-underline-offset: 0.15em;
+      }
+      .lab-link:hover {
+        color: var(--color-rust-deep);
+      }
+
+      /* Preflight zeroes paragraph margins and the lab does not use
+         .prose-typed, so the specimen needs its own rhythm. */
+      #specimen p + p {
+        margin-top: 1.5em;
+      }
+
+      /* Each display face wants its own weight and variable-axis settings to
+         look like itself; the script writes them onto the specimen. */
+      #specimen .font-display,
+      #specimen h2,
+      #specimen h3 {
+        font-weight: var(--lab-display-weight, 400);
+        font-variation-settings: var(--lab-display-variation, normal);
+      }
+    </style>
+
+    <script>
+      const specimen = document.getElementById("specimen")!;
+      const readout = document.getElementById("readout")!;
+      const notes = document.getElementById("notes")!;
+
+      const state = {
+        body: "courier-prime",
+        display: "young-serif",
+        size: 16,
+        leading: 1.7,
+        measure: 38,
+        displaySize: 4.5,
+      };
+
+      type StateKey = keyof typeof state;
+
+      const chips = Array.from(
+        document.querySelectorAll<HTMLButtonElement>(".lab-chip"),
+      );
+
+      function chipFor(group: string, id: string) {
+        return chips.find(
+          (c) => c.dataset.group === group && c.dataset.id === id,
+        );
+      }
+
+      function apply() {
+        const bodyChip = chipFor("body", state.body);
+        const displayChip = chipFor("display", state.display);
+        const bodyStack = bodyChip?.dataset.stack ?? "";
+
+        for (const chip of chips) {
+          const group = chip.dataset.group as "body" | "display";
+          chip.setAttribute(
+            "aria-pressed",
+            String(chip.dataset.id === state[group]),
+          );
+        }
+
+        /* "Same as body" resolves through this, so it tracks the body choice. */
+        specimen.style.setProperty("--lab-body-stack", bodyStack);
+        specimen.style.setProperty("--font-body", bodyStack);
+        specimen.style.setProperty(
+          "--font-display",
+          displayChip?.dataset.stack ?? "",
+        );
+        specimen.style.setProperty(
+          "--lab-display-weight",
+          displayChip?.dataset.weight ?? "400",
+        );
+        specimen.style.setProperty(
+          "--lab-display-variation",
+          displayChip?.dataset.variation || "normal",
+        );
+        specimen.style.fontFamily = "var(--font-body)";
+        specimen.style.fontSize = `${state.size}px`;
+        specimen.style.lineHeight = String(state.leading);
+        specimen.style.setProperty("--measure", `${state.measure}rem`);
+        specimen.style.setProperty("--display-size", `${state.displaySize}rem`);
+
+        readout.textContent = `${bodyChip?.textContent?.trim()} + ${displayChip?.textContent?.trim()}`;
+        notes.textContent = `${bodyChip?.dataset.note ?? ""} — ${displayChip?.dataset.note ?? ""}`;
+
+        localStorage.setItem("type-lab", JSON.stringify(state));
+      }
+
+      for (const chip of chips) {
+        chip.addEventListener("click", () => {
+          const group = chip.dataset.group as "body" | "display";
+          state[group] = chip.dataset.id!;
+          apply();
+        });
+      }
+
+      const sliders: Array<[string, StateKey, string, (v: number) => string]> =
+        [
+          ["in-size", "size", "out-size", (v) => `${v}px`],
+          ["in-leading", "leading", "out-leading", (v) => v.toFixed(2)],
+          ["in-measure", "measure", "out-measure", (v) => `${v}rem`],
+          ["in-display", "displaySize", "out-display", (v) => `${v}rem`],
+        ];
+
+      for (const [inputId, key, outputId, format] of sliders) {
+        const input = document.getElementById(inputId) as HTMLInputElement;
+        const output = document.getElementById(outputId)!;
+        input.addEventListener("input", () => {
+          (state[key] as number) = Number(input.value);
+          output.textContent = format(Number(input.value));
+          apply();
+        });
+      }
+
+      const saved = localStorage.getItem("type-lab");
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          /* Display faces changed, so an old saved id would select nothing. */
+          if (chipFor("display", parsed.display) && chipFor("body", parsed.body)) {
+            Object.assign(state, parsed);
+          }
+          for (const [inputId, key, outputId, format] of sliders) {
+            const input = document.getElementById(inputId) as HTMLInputElement;
+            input.value = String(state[key]);
+            document.getElementById(outputId)!.textContent = format(
+              state[key] as number,
+            );
+          }
+        } catch {
+          /* ignore a corrupt saved state and fall back to defaults */
+        }
+      }
+
+      apply();
+    </script>
+  </body>
+</html>

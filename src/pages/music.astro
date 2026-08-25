@@ -1,0 +1,172 @@
+---
+import Base from "../layouts/Base.astro";
+import CoverCard from "../components/CoverCard.astro";
+import PageHeader from "../components/PageHeader.astro";
+import EmptySlot from "../components/EmptySlot.astro";
+import { getCovers, pickFeatured } from "../lib/content";
+
+const covers = await getCovers();
+const featured = pickFeatured(covers);
+const rest = covers.filter((cover) => cover.id !== featured?.id);
+
+const tagCounts = new Map<string, number>();
+for (const cover of covers) {
+  for (const tag of cover.data.tags) {
+    tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
+  }
+}
+const tags = [...tagCounts.entries()].sort((a, b) => b[1] - a[1]);
+---
+
+<Base
+  title="Music"
+  description="Guitar covers, recorded at home, buzzes and all."
+  image="/og/music.png"
+>
+  <PageHeader
+    eyebrow="Music"
+    title="Songs I have taken apart"
+    intro="Guitar covers, recorded at home."
+  />
+
+  {
+    tags.length > 0 && (
+      <section
+        class="measure-wide mx-auto px-5 sm:px-8"
+        aria-label="Filter covers by tag"
+      >
+        <div class="flex flex-wrap items-baseline gap-2 border-b border-hairline pb-6">
+          <button type="button" class="tag-filter" data-tag="" aria-pressed="true">
+            Everything <span class="text-stone">({covers.length})</span>
+          </button>
+          {tags.map(([tag, count]) => (
+            <button
+              type="button"
+              class="tag-filter"
+              data-tag={tag}
+              aria-pressed="false"
+            >
+              {tag} <span class="text-stone">({count})</span>
+            </button>
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  {/* Both sections stay put whether or not there is anything in them. */}
+  <section class="measure-wide mx-auto px-5 py-12 sm:px-8">
+    <p class="eyebrow eyebrow-rust mb-4" data-heading-for="pinned">Pinned</p>
+    {
+      featured ? (
+        <div data-cover data-group="pinned" data-tags={featured.data.tags.join("|")}>
+          <CoverCard cover={featured} featured />
+        </div>
+      ) : (
+        <EmptySlot
+          label="Nothing pinned"
+          hint="Set pinned: true on a cover to feature it here."
+          tall
+        />
+      )
+    }
+
+    <p class="eyebrow eyebrow-rust mt-16 mb-4" data-heading-for="rest">
+      Everything else
+    </p>
+    {
+      rest.length > 0 ? (
+        <ul class="m-0 grid list-none gap-6 p-0 sm:grid-cols-2">
+          {rest.map((cover) => (
+            <li data-cover data-group="rest" data-tags={cover.data.tags.join("|")}>
+              <CoverCard cover={cover} />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <EmptySlot
+          label="No covers yet"
+          hint="Add a markdown file to src/content/covers/ and it appears here."
+        />
+      )
+    }
+
+    <p class="mt-10 mb-0 hidden text-stone" id="no-matches" role="status">
+      Nothing tagged that way yet.
+    </p>
+  </section>
+</Base>
+
+<style>
+  .tag-filter {
+    border: 1px solid var(--color-hairline);
+    background: transparent;
+    color: var(--color-ink);
+    font: inherit;
+    font-size: var(--text-meta);
+    padding: 0.3rem 0.7rem;
+    cursor: pointer;
+    transition:
+      background-color 0.15s ease,
+      border-color 0.15s ease,
+      color 0.15s ease;
+  }
+  .tag-filter:hover {
+    border-color: var(--color-rust);
+    color: var(--color-rust);
+  }
+  .tag-filter[aria-pressed="true"] {
+    background: var(--color-ink);
+    border-color: var(--color-ink);
+    color: var(--color-paper);
+  }
+  .tag-filter[aria-pressed="true"] :global(span) {
+    color: color-mix(in srgb, var(--color-paper) 65%, transparent);
+  }
+</style>
+
+<script>
+  const filters = Array.from(
+    document.querySelectorAll<HTMLButtonElement>(".tag-filter"),
+  );
+  const covers = Array.from(
+    document.querySelectorAll<HTMLElement>("[data-cover]"),
+  );
+  const empty = document.getElementById("no-matches");
+
+  const headings = Array.from(
+    document.querySelectorAll<HTMLElement>("[data-heading-for]"),
+  );
+
+  function applyFilter(tag: string) {
+    const visiblePerGroup = new Map<string, number>();
+
+    for (const cover of covers) {
+      const tags = (cover.dataset.tags ?? "").split("|").filter(Boolean);
+      const matches = tag === "" || tags.includes(tag);
+      cover.hidden = !matches;
+
+      const group = cover.dataset.group ?? "";
+      if (matches) {
+        visiblePerGroup.set(group, (visiblePerGroup.get(group) ?? 0) + 1);
+      }
+    }
+
+    for (const filter of filters) {
+      filter.setAttribute("aria-pressed", String(filter.dataset.tag === tag));
+    }
+
+    /* A "Pinned" label floating above nothing looks broken, so section
+       headings disappear with their contents. */
+    for (const heading of headings) {
+      heading.hidden = !visiblePerGroup.get(heading.dataset.headingFor ?? "");
+    }
+
+    const total = [...visiblePerGroup.values()].reduce((a, b) => a + b, 0);
+    empty?.classList.toggle("hidden", total > 0);
+  }
+
+  for (const filter of filters) {
+    filter.addEventListener("click", () => applyFilter(filter.dataset.tag!));
+  }
+</script>

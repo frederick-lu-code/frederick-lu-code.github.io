@@ -1,0 +1,45 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { formatShortDate, readingTime } from "../lib/content";
+
+interface Props {
+  musing: CollectionEntry<"musings">;
+  index: number;
+}
+
+const { musing, index } = Astro.props;
+const { title, deck, date } = musing.data;
+---
+
+<li class="border-t border-hairline last:border-b">
+  <a
+    href={`/musings/${musing.id}`}
+    class="group grid grid-cols-[2.5rem_1fr] items-baseline gap-x-4 py-6 no-underline sm:grid-cols-[3.5rem_1fr_9rem]"
+  >
+    <span class="text-meta text-stone tabular-nums">
+      {String(index + 1).padStart(2, "0")}
+    </span>
+
+    <span class="flex flex-col gap-1.5">
+      <span
+        class="font-display text-title transition-colors duration-200 group-hover:text-rust"
+      >
+        {title}
+      </span>
+      <span class="text-[0.9375rem] leading-relaxed text-stone-warm">
+        {deck}
+      </span>
+      <span class="text-meta text-stone sm:hidden">
+        <time datetime={date.toISOString()}>{formatShortDate(date)}</time>
+        &middot; {readingTime(musing.body)}
+      </span>
+    </span>
+
+    <span
+      class="col-start-3 hidden text-right text-meta text-stone sm:flex sm:flex-col sm:gap-0.5"
+    >
+      <time datetime={date.toISOString()}>{formatShortDate(date)}</time>
+      <span>{readingTime(musing.body)}</span>
+    </span>
+  </a>
+</li>

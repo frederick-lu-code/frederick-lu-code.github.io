@@ -1,0 +1,31 @@
+---
+import { MARQUEE } from "../config";
+
+/* The track is rendered twice and translated by -50%, so the loop is seamless.
+   The duplicate is hidden from assistive tech. */
+const items = [...MARQUEE];
+---
+
+{
+  items.length > 0 && (
+    <div class="overflow-hidden border-y border-hairline bg-paper-light py-3 select-none">
+      <div class="flex w-max animate-marquee">
+        {[0, 1].map((copy) => (
+          <ul
+            class="m-0 flex list-none items-center gap-8 p-0 pr-8"
+            aria-hidden={copy === 1 ? "true" : undefined}
+          >
+            {items.map((item) => (
+              <li class="flex items-center gap-8 text-meta whitespace-nowrap text-stone-warm">
+                {item}
+                <span class="text-rust" aria-hidden="true">
+                  &#9679;
+                </span>
+              </li>
+            ))}
+          </ul>
+        ))}
+      </div>
+    </div>
+  )
+}
