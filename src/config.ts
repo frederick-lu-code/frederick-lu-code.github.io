@@ -1,6 +1,6 @@
 /**
  * Everything about you that the site reads from one place.
- * Change these before deploying; `url` in particular feeds the sitemap and RSS.
+ * Change these before deploying; `url` in particular feeds the sitemap.
  */
 export const SITE = {
   url: "https://frederick-lu-code.github.io",
@@ -8,7 +8,6 @@ export const SITE = {
   tagline: "Guitar covers, things I am still thinking about, and whatever else.",
   description:
     "Guitar covers, essays, and the things I keep thinking about. A personal site by Freddie.",
-  email: "hello@freddie.dev",
   locale: "en",
 } as const;
 
@@ -16,7 +15,6 @@ export const NAV = [
   { href: "/experience", label: "Experience" },
   { href: "/music", label: "Music" },
   { href: "/musings", label: "Musings" },
-  { href: "/about", label: "About" },
 ] as const;
 
 export const SOCIALS = [

@@ -17,13 +17,11 @@ them stay in the layout and stay blank until you add a file.
 
 Placeholders to replace:
 
-1. `src/config.ts` — tagline, email, socials, and the `url`. The URL also has to
+1. `src/config.ts` — tagline, socials, and the `url`. The URL also has to
    be updated in `astro.config.mjs` and `public/robots.txt`, since neither can
    import TypeScript. `NOW` and `MARQUEE` are empty arrays; the homepage strip
    and the scrolling band only render once they have entries.
-2. `public/portrait.svg` — replace with a real photo and point the `src` at it
-   in `src/pages/index.astro` and `src/pages/about.mdx`.
-3. `src/pages/about.mdx` — scaffolding, waiting to be written.
+2. `public/portrait.jpg` — the homepage photo.
 
 While the collections are empty, `astro build` prints `The collection "covers"
 does not exist or is empty`. That is expected and stops once a file exists.
