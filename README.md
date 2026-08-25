@@ -13,7 +13,7 @@ npm run preview    # serve the built site
 ## Before you deploy
 
 The site ships with no covers and no essays, on purpose. The sections that hold
-them are still there, showing an empty slot until you add a file.
+them stay in the layout and stay blank until you add a file.
 
 Placeholders to replace:
 

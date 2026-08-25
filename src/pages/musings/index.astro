@@ -2,7 +2,6 @@
 import Base from "../../layouts/Base.astro";
 import MusingRow from "../../components/MusingRow.astro";
 import PageHeader from "../../components/PageHeader.astro";
-import EmptySlot from "../../components/EmptySlot.astro";
 import { getMusings } from "../../lib/content";
 
 const musings = await getMusings();
@@ -21,12 +20,7 @@ const musings = await getMusings();
 
   <section class="measure-wide mx-auto px-5 pb-20 sm:px-8">
     {
-      musings.length === 0 ? (
-        <EmptySlot
-          label="Nothing written yet"
-          hint="Add an .mdx file to src/content/musings/ and it appears here."
-        />
-      ) : (
+      musings.length > 0 && (
         <ol class="m-0 list-none p-0">
           {musings.map((musing, index) => (
             <MusingRow musing={musing} index={index} />
