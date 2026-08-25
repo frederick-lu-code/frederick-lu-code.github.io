@@ -5,7 +5,6 @@
 export const SITE = {
   url: "https://frederick-lu-code.github.io",
   name: "Freddie",
-  /* Placeholder wording. Rewrite it in your own voice. */
   tagline: "Guitar covers, things I am still thinking about, and whatever else.",
   description:
     "Guitar covers, essays, and the things I keep thinking about. A personal site by Freddie.",

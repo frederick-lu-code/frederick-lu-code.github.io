@@ -2,7 +2,6 @@
 import Base from "../layouts/Base.astro";
 import CoverCard from "../components/CoverCard.astro";
 import PageHeader from "../components/PageHeader.astro";
-import EmptySlot from "../components/EmptySlot.astro";
 import { getCovers, pickFeatured } from "../lib/content";
 
 const covers = await getCovers();
@@ -54,20 +53,13 @@ const tags = [...tagCounts.entries()].sort((a, b) => b[1] - a[1]);
     )
   }
 
-  {/* Both sections stay put whether or not there is anything in them. */}
   <section class="measure-wide mx-auto px-5 py-12 sm:px-8">
     <p class="eyebrow eyebrow-rust mb-4" data-heading-for="pinned">Pinned</p>
     {
-      featured ? (
+      featured && (
         <div data-cover data-group="pinned" data-tags={featured.data.tags.join("|")}>
           <CoverCard cover={featured} featured />
         </div>
-      ) : (
-        <EmptySlot
-          label="Nothing pinned"
-          hint="Set pinned: true on a cover to feature it here."
-          tall
-        />
       )
     }
 
@@ -75,7 +67,7 @@ const tags = [...tagCounts.entries()].sort((a, b) => b[1] - a[1]);
       Everything else
     </p>
     {
-      rest.length > 0 ? (
+      rest.length > 0 && (
         <ul class="m-0 grid list-none gap-6 p-0 sm:grid-cols-2">
           {rest.map((cover) => (
             <li data-cover data-group="rest" data-tags={cover.data.tags.join("|")}>
@@ -83,11 +75,6 @@ const tags = [...tagCounts.entries()].sort((a, b) => b[1] - a[1]);
             </li>
           ))}
         </ul>
-      ) : (
-        <EmptySlot
-          label="No covers yet"
-          hint="Add a markdown file to src/content/covers/ and it appears here."
-        />
       )
     }
 
@@ -156,8 +143,6 @@ const tags = [...tagCounts.entries()].sort((a, b) => b[1] - a[1]);
       filter.setAttribute("aria-pressed", String(filter.dataset.tag === tag));
     }
 
-    /* A "Pinned" label floating above nothing looks broken, so section
-       headings disappear with their contents. */
     for (const heading of headings) {
       heading.hidden = !visiblePerGroup.get(heading.dataset.headingFor ?? "");
     }

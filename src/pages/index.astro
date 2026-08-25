@@ -3,7 +3,6 @@ import Base from "../layouts/Base.astro";
 import CoverCard from "../components/CoverCard.astro";
 import Marquee from "../components/Marquee.astro";
 import NowStrip from "../components/NowStrip.astro";
-import EmptySlot from "../components/EmptySlot.astro";
 import { SITE } from "../config";
 import {
   formatShortDate,
@@ -66,11 +65,7 @@ const latestMusing = musings[0];
         <a href="/music" class="link-quiet text-meta text-stone">All music</a>
       </div>
       {
-        latestCover ? (
-          <CoverCard cover={latestCover} />
-        ) : (
-          <EmptySlot label="No covers yet" tall />
-        )
+        latestCover && <CoverCard cover={latestCover} />
       }
     </div>
 
@@ -83,7 +78,7 @@ const latestMusing = musings[0];
       </div>
 
       {
-        latestMusing ? (
+        latestMusing && (
           <a
             href={`/musings/${latestMusing.id}`}
             class="group flex flex-1 flex-col gap-4 border border-hairline bg-paper-light p-5 no-underline transition-colors duration-200 hover:border-rust sm:p-8"
@@ -106,8 +101,6 @@ const latestMusing = musings[0];
 
             <p class="link mt-auto mb-0 text-meta">Read it</p>
           </a>
-        ) : (
-          <EmptySlot label="Nothing written yet" tall />
         )
       }
     </div>
