@@ -3,7 +3,7 @@
  * Change these before deploying; `url` in particular feeds the sitemap and RSS.
  */
 export const SITE = {
-  url: "https://freddie.dev",
+  url: "https://frederick-lu-code.github.io",
   name: "Freddie",
   /* Placeholder wording. Rewrite it in your own voice. */
   tagline: "Guitar covers, things I am still thinking about, and whatever else.",

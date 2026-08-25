@@ -8,7 +8,7 @@ import sitemap from "@astrojs/sitemap";
 // https://astro.build/config
 export default defineConfig({
   // Keep in sync with SITE.url in src/config.ts. Feeds the sitemap and RSS.
-  site: "https://freddie.dev",
+  site: "https://frederick-lu-code.github.io",
 
   vite: {
     plugins: [tailwindcss()],
