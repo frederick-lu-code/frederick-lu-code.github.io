@@ -1,0 +1,26 @@
+---
+import Base from "../layouts/Base.astro";
+import PageHeader from "../components/PageHeader.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import { getProjects } from "../lib/content";
+
+const projects = await getProjects();
+---
+
+<Base
+  title="Projects"
+  description="Things I have built."
+  image="/og/projects.png"
+>
+  <PageHeader eyebrow="Projects" title="Things I have built" />
+
+  {
+    projects.length > 0 && (
+      <section class="measure-wide mx-auto px-5 pb-24 sm:px-8">
+        {projects.map((project) => (
+          <ProjectCard project={project} />
+        ))}
+      </section>
+    )
+  }
+</Base>

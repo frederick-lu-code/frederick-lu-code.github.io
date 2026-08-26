@@ -45,6 +45,19 @@ note: Why you learned it. One or two sentences, in your voice.
 ---
 ```
 
+**A project.** Drop a markdown file in `src/content/projects/`:
+
+```yaml
+---
+title: The thing
+deck: What it is, in a sentence or two.
+href: https://example.com
+date: 2026-08-01
+featured: false
+tags: [ios, rust]
+---
+```
+
 **An essay.** Drop an `.mdx` file in `src/content/musings/`. It needs `title`,
 `deck` and `date`; `tags`, `updated` and `draft` are optional. Drafts show up in
 `npm run dev` and are excluded from the build. Two components are available

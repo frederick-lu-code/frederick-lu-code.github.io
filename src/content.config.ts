@@ -19,6 +19,21 @@ const covers = defineCollection({
   }),
 });
 
+const projects = defineCollection({
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/projects" }),
+  schema: z.object({
+    title: z.string(),
+    /** One or two sentences under the title. */
+    deck: z.string(),
+    date: z.coerce.date(),
+    /** Where the project lives. The card links here. */
+    href: z.url().optional(),
+    tags: z.array(z.string()).default([]),
+    featured: z.boolean().default(false),
+    draft: z.boolean().default(false),
+  }),
+});
+
 const musings = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/musings" }),
   schema: z.object({
@@ -32,4 +47,4 @@ const musings = defineCollection({
   }),
 });
 
-export const collections = { covers, musings };
+export const collections = { covers, musings, projects };

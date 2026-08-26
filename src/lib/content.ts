@@ -18,6 +18,14 @@ export async function getCovers(): Promise<CollectionEntry<"covers">[]> {
   return covers.sort(byNewest);
 }
 
+export async function getProjects(): Promise<CollectionEntry<"projects">[]> {
+  const projects = await getCollection("projects", isPublished);
+  return projects.sort((a, b) => {
+    if (a.data.featured !== b.data.featured) return a.data.featured ? -1 : 1;
+    return byNewest(a, b);
+  });
+}
+
 /** The newest featured cover, falling back to the newest cover overall. */
 export function pickFeatured(covers: CollectionEntry<"covers">[]) {
   return covers.find((cover) => cover.data.featured) ?? covers[0];

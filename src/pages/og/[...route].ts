@@ -11,6 +11,10 @@ const pages: Record<string, { title: string; description: string }> = {
     title: "Where I have worked",
     description: "Jane Street, TikTok, Google, UNSW, Loch Safety.",
   },
+  projects: {
+    title: "Things I have built",
+    description: "Projects.",
+  },
   music: {
     title: "Songs I have taken apart",
     description: "Guitar covers, recorded at home, buzzes and all.",
